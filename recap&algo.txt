@@ -1,0 +1,32 @@
+Propriétés:
+-homogénéité couleurs(niveau gris)
+-partition de l'image
+-bord des objets inclus dans bord des superpixels
+-superpixles forment motif régulier sur image
+
+Etapes:
+-calcul gradient image
+-definition de cellules centrées sur les sommet d'une grille régulière(carré/hexagonale) sur l'image:
+	-choix de N points sur les sommets d'une grille régulière, pointsdespacés de sigma
+	-https://fr.wikipedia.org/wiki/Diagramme_de_Vorono%C3%AF (decoupage de l'espace en zone, chaque zone est l'ensemble des points les plus prohces d'un des sommets choisis juste avant)
+	-homothétie de facteur rho < 1 sur les cellules pour créer de l'espace entre elles
+-selection d'un marqueur par cellule:
+	- on choisit la composante connexe de la valeur minimale du gradient dans cette cellule avec le plus grand coeff d'extinction surfacique(faire des recherches dessus)
+	- s'il n'y a pas unicité (très rare) on doit rajouter une étape pour n'en garder qu'une
+-regularisation spatiale du gradient:
+	-distance d_Q(p)= 2/sigma*min d(p,q_i) où p = coordonnées d'un point, Q = ensemble de N composnates connexes de l'image, sigma = distance entre deux centres de cellules, q_i = éléments de Q, d = distance usuelle (racine de somme des carrés)
+	-Q = ensemble des marqueurs (waterpixels collent plus au bord des objets) ou centres des cellules (waterpixels plus réguliers)
+	-gradient regularisé = gradient + k*d_Q où k est un réel positif à choisir
+-application d'un algorithme de watershed à partir des marqueurs sur le gradient régularisé
+
+
+
+
+EN PRATIQUE:
+-Lab-gradient
+-rho = 2/3
+-grille hexagonale
+-k entre 0 et 16
+-sigma autour de (coté image)/10 (déterminé par sqrt(nombre px image/nombre superpixels) où nombre superpixels est un paramètre de la fonction)
+-Q = ensemble des marqueurs sauf si beaucoup de bruit sur l'image
+-SMIL library (C++) https://github.com/MinesParis-MorphoMath/smil, on fera du python
